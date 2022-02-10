@@ -1,5 +1,6 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
+const bcrypt = require('bcrypt');
 
 /// Users
 const { Pool } = require('pg');
@@ -17,17 +18,22 @@ const pool = new Pool({
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithEmail = function(email) {
-  let user;
-  for (const userId in users) {
-    user = users[userId];
-    if (user.email.toLowerCase() === email.toLowerCase()) {
-      break;
-    } else {
-      user = null;
-    }
-  }
-  return Promise.resolve(user);
-}
+  
+  console.log("getUserWithEmail is running");
+  return pool.query(`
+  SELECT * 
+  FROM users
+  WHERE users.email = $1`, [email])
+    .then(result => {
+      if (result.rows.length === 0) {
+        return null;
+      }
+      return result.rows[0];
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
