@@ -1,15 +1,8 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
 
-/// Link to the lightbnb postgreSQL database
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
+// 
+const db = require('../db');
 
 /**
  * Get a single user from the database given their email.
@@ -18,7 +11,7 @@ const pool = new Pool({
  */
 const getUserWithEmail = function(email) {
   // Query database with user-inputted email
-  return pool.query(`
+  return db.query(`
   SELECT * 
   FROM users
   WHERE email = $1`, [email])
@@ -42,7 +35,7 @@ exports.getUserWithEmail = getUserWithEmail;
  */
 const getUserWithId = function(id) {
   // Query database for a user with a specific ID
-  return pool.query(`
+  return db.query(`
   SELECT * 
   FROM users
   WHERE id = $1`, [id])
@@ -67,7 +60,7 @@ exports.getUserWithId = getUserWithId;
  */
 const addUser =  function(user) {
   // Insert user into database and return object with user ID
-  return pool.query(`
+  return db.query(`
   INSERT INTO users
     (name, email, password)
   VALUES 
@@ -89,14 +82,14 @@ exports.addUser = addUser;
  */
 const getAllReservations = function(guest_id, limit = 10) {
   // Return all reservation details including property details
-  return pool.query(`
+  return db.query(`
   SELECT reservations.*, properties.*, AVG(property_reviews.rating) as average_rating
   FROM reservations 
   JOIN properties ON reservations.property_id = properties.id
   JOIN property_reviews ON property_reviews.property_id = properties.id
   WHERE reservations.guest_id = $1
   GROUP BY reservations.id, properties.id
-  LIMIT $2`, [guest_id, limit])
+  LIMIT $2;`, [guest_id, limit])
     .then(result => result.rows)
     .catch((err) => {
       console.log(err.message);
@@ -167,9 +160,7 @@ const getAllProperties = function(options, limit = 10) {
   LIMIT $${queryParams.length};
   `;
 
-  console.log(queryString, queryParams);
-
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
     .then((result) => result.rows)
     .catch((err) => {
       console.log(err.message);
@@ -185,7 +176,7 @@ exports.getAllProperties = getAllProperties;
  * @return {Promise<{}>} A promise to the property.
  */
 const addProperty = function(property) {
-  return pool.query(`
+  return db.query(`
   INSERT INTO properties
     (title, description, thumbnail_photo_url, cover_photo_url, cost_per_night, parking_spaces, number_of_bathrooms, number_of_bedrooms, country, street, city, province, post_code)
   VALUES 
