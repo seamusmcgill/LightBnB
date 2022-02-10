@@ -1,8 +1,7 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
-const bcrypt = require('bcrypt');
 
-/// Users
+/// Link to the lightbnb postgreSQL database
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -18,16 +17,16 @@ const pool = new Pool({
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithEmail = function(email) {
-  
-  console.log("getUserWithEmail is running");
+  // Query database with user-inputted email
   return pool.query(`
   SELECT * 
   FROM users
-  WHERE users.email = $1`, [email])
+  WHERE email = $1`, [email])
     .then(result => {
       if (result.rows.length === 0) {
         return null;
       }
+      // Return user object if successful
       return result.rows[0];
     })
     .catch((err) => {
@@ -42,7 +41,21 @@ exports.getUserWithEmail = getUserWithEmail;
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithId = function(id) {
-  return Promise.resolve(users[id]);
+  // Query database for a user with a specific ID
+  return pool.query(`
+  SELECT * 
+  FROM users
+  WHERE id = $1`, [id])
+    .then(result => {
+      if (result.rows.length === 0) {
+        return null;
+      }
+      // Return user object if successful
+      return result.rows[0];
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
 }
 exports.getUserWithId = getUserWithId;
 
