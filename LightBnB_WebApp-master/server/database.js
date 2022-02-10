@@ -73,9 +73,7 @@ const addUser =  function(user) {
   VALUES 
     ($1, $2, $3) 
   RETURNING *`, [user.name, user.email, user.password])
-    .then(result => {
-      return result.rows[0];
-    })
+    .then(result => result.rows[0])
     .catch((err) => {
       console.log(err.message);
     });
@@ -90,8 +88,17 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
-}
+  // Return all reservation details including property details
+  return pool.query(`
+  SELECT reservations.*, properties.*
+  FROM reservations JOIN properties ON reservations.property_id = properties.id
+  WHERE guest_id = $1
+  LIMIT $2`, [guest_id, limit])
+    .then(result => result.rows)
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
 exports.getAllReservations = getAllReservations;
 
 /// Properties
