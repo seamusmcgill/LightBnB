@@ -75,6 +75,20 @@ exports.addUser = addUser;
 
 /// Reservations
 
+const addReservation = function(reservation) {
+  return db.query(`
+  INSERT INTO RESERVATIONS
+    (guest_id, property_id, start_date, end_date)
+  VALUES
+    ($1, $2, $3, $4)
+  RETURNING *`, [reservation.guest_id, reservation.property_id, reservation.start_date, reservation.end_date])
+    .then(result => result.rows[0])
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
+exports.addReservation = addReservation;
+
 /**
  * Get all reservations for a single user.
  * @param {string} guest_id The id of the user.
