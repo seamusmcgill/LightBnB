@@ -16,11 +16,25 @@ module.exports = function(router, database) {
       return;
     }
     database.getAllReservations(userId)
-    .then(reservations => res.send({reservations}))
-    .catch(e => {
-      console.error(e);
-      res.send(e)
-    });
+      .then(reservations => res.send({reservations}))
+      .catch(e => {
+        console.error(e);
+        res.send(e);
+      });
+  });
+
+  router.post('/reservations', (req, res) => {
+   
+    const userId = req.session.userId;
+    database.addReservation({...req.body, guest_id: userId})
+      .then(reservation => {
+        res.send(reservation);
+        res.redirect('/');
+      })
+      .catch(e => {
+        console.error(e);
+        res.send(e);
+      });
   });
 
   router.post('/properties', (req, res) => {
