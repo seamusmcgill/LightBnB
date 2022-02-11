@@ -8,7 +8,6 @@
   margin: 20px 0;
   width: 100%;
   max-width: 600px;
-  height: 200px;
   border: 1px solid black;
   box-sizing: border-box;
   display: flex;
@@ -16,6 +15,9 @@
   justify-content: space-between;
   align-items: stretch;
   align-content: stretch; }
+  .property-listing__details{
+    padding: 2em;
+  }
   .property-listing__title {
     font-size: 1.0rem; }
   .property-listing__preview-image {
@@ -30,7 +32,7 @@
   .property-listing {
     flex-direction: column;
     height: 400px; } }
-.search-property-form, .login-form, .new-property-form, .sign-up-form {
+.search-property-form, .login-form, .new-property-form, .sign-up-form, .reservation-form {
   max-width: 400px;
   display: flex;
   flex-direction: column;
